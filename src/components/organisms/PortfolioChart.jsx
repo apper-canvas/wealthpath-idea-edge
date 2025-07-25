@@ -7,15 +7,19 @@ import { portfolioService } from "@/services/api/portfolioService";
 
 const PortfolioChart = () => {
   const [allocation, setAllocation] = useState(null);
+  const [detailedAllocation, setDetailedAllocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
-  const loadAllocation = async () => {
+const loadAllocation = async () => {
     try {
       setError(null);
       setLoading(true);
-      const data = await portfolioService.getAllocation();
-      setAllocation(data);
+      const [basicData, detailedData] = await Promise.all([
+        portfolioService.getAllocation(),
+        portfolioService.getDetailedAllocation()
+      ]);
+      setAllocation(basicData);
+      setDetailedAllocation(detailedData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -27,9 +31,9 @@ const PortfolioChart = () => {
     loadAllocation();
   }, []);
   
-  if (loading) return <Loading />;
+if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadAllocation} />;
-  if (!allocation) return null;
+  if (!allocation || !detailedAllocation) return null;
   
   const chartOptions = {
     chart: {
@@ -144,23 +148,47 @@ const PortfolioChart = () => {
           />
         </div>
         
-        <div className="grid grid-cols-2 gap-4 mt-6">
-          {[
-            { label: "Stocks", value: allocation.stocks, color: "bg-blue-500" },
-            { label: "Bonds", value: allocation.bonds, color: "bg-green-500" },
-            { label: "Cash", value: allocation.cash, color: "bg-yellow-500" },
-            { label: "Other", value: allocation.other, color: "bg-purple-500" },
-          ].map(({ label, value, color }) => (
-            <div key={label} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg">
-              <div className={`w-3 h-3 rounded-full ${color} shadow-sm`}></div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-slate-700">{label}</span>
-                  <span className="text-sm font-semibold text-slate-900">{value}%</span>
+<div className="space-y-4 mt-6">
+          {/* Asset Class Summary */}
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "Stocks", value: allocation.stocks, color: "bg-blue-500" },
+              { label: "Bonds", value: allocation.bonds, color: "bg-green-500" },
+              { label: "Cash", value: allocation.cash, color: "bg-yellow-500" },
+              { label: "Other", value: allocation.other, color: "bg-purple-500" },
+            ].map(({ label, value, color }) => (
+              <div key={label} className="flex items-center space-x-3 p-3 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg">
+                <div className={`w-3 h-3 rounded-full ${color} shadow-sm`}></div>
+                <div className="flex-1">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-slate-700">{label}</span>
+                    <span className="text-sm font-semibold text-slate-900">{value}%</span>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+
+          {/* Top Holdings Breakdown */}
+          <div className="border-t border-slate-200 pt-4">
+            <h4 className="text-sm font-semibold text-slate-700 mb-3">Top Holdings</h4>
+            <div className="space-y-2">
+              {detailedAllocation.breakdown.stocks
+                .sort((a, b) => b.totalValue - a.totalValue)
+                .slice(0, 5)
+                .map((holding) => (
+                  <div key={holding.Id} className="flex items-center justify-between py-2 px-3 bg-slate-50 rounded-lg">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      <span className="text-xs font-medium text-slate-700">{holding.symbol}</span>
+                    </div>
+                    <span className="text-xs font-semibold text-slate-900">
+                      {holding.percentage.toFixed(1)}%
+                    </span>
+                  </div>
+                ))}
             </div>
-          ))}
+          </div>
         </div>
       </CardContent>
     </Card>

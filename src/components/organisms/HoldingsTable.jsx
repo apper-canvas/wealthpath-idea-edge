@@ -82,7 +82,7 @@ const HoldingsTable = () => {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200">
+<tr className="border-b border-slate-200">
                 <th className="text-left py-3 px-2">
                   <SortButton field="symbol">Symbol</SortButton>
                 </th>
@@ -95,11 +95,17 @@ const HoldingsTable = () => {
                 <th className="text-right py-3 px-2">
                   <SortButton field="currentPrice">Price</SortButton>
                 </th>
+                <th className="text-right py-3 px-2 hidden lg:table-cell">
+                  <SortButton field="costBasis">Cost Basis</SortButton>
+                </th>
                 <th className="text-right py-3 px-2">
                   <SortButton field="totalValue">Value</SortButton>
                 </th>
                 <th className="text-right py-3 px-2">
-                  <SortButton field="dayChange">Change</SortButton>
+                  <SortButton field="dayChange">Day Change</SortButton>
+                </th>
+                <th className="text-right py-3 px-2 hidden xl:table-cell">
+                  <SortButton field="unrealizedGain">Total Gain/Loss</SortButton>
                 </th>
                 <th className="text-right py-3 px-2 hidden md:table-cell">
                   <SortButton field="allocation">%</SortButton>
@@ -107,10 +113,19 @@ const HoldingsTable = () => {
               </tr>
             </thead>
             <tbody>
-              {sortedHoldings.map((holding) => {
+{sortedHoldings.map((holding) => {
                 const changeColor = getChangeColor(holding.dayChange);
                 const changeIcon = getChangeIcon(holding.dayChange);
                 const changePercent = (holding.dayChange / (holding.totalValue - holding.dayChange)) * 100;
+                
+                // Calculate cost basis and unrealized gain
+                const costBasisPerShare = holding.currentPrice - (holding.dayChange / holding.quantity);
+                const totalCostBasis = holding.quantity * costBasisPerShare;
+                const unrealizedGain = holding.totalValue - totalCostBasis;
+                const totalReturnPercent = (unrealizedGain / totalCostBasis) * 100;
+                
+                const gainColor = getChangeColor(unrealizedGain);
+                const gainIcon = getChangeIcon(unrealizedGain);
                 
                 return (
                   <tr 
@@ -138,6 +153,11 @@ const HoldingsTable = () => {
                         {formatCurrency(holding.currentPrice, { showCents: true })}
                       </span>
                     </td>
+                    <td className="py-4 px-2 text-right hidden lg:table-cell">
+                      <span className="font-medium text-slate-700 currency-display">
+                        {formatCurrency(totalCostBasis)}
+                      </span>
+                    </td>
                     <td className="py-4 px-2 text-right">
                       <span className="font-semibold text-slate-900 currency-display">
                         {formatCurrency(holding.totalValue)}
@@ -152,6 +172,19 @@ const HoldingsTable = () => {
                         <span className="text-xs">
                           ({formatPercentage(Math.abs(changePercent))})
                         </span>
+                      </div>
+                    </td>
+                    <td className="py-4 px-2 text-right hidden xl:table-cell">
+                      <div className={`flex items-center justify-end space-x-1 ${gainColor}`}>
+                        <ApperIcon name={gainIcon} className="h-3 w-3" />
+                        <div className="text-right">
+                          <div className="text-sm font-medium currency-display">
+                            {formatCurrency(Math.abs(unrealizedGain), { compact: true })}
+                          </div>
+                          <div className="text-xs">
+                            ({formatPercentage(Math.abs(totalReturnPercent))})
+                          </div>
+                        </div>
                       </div>
                     </td>
                     <td className="py-4 px-2 text-right hidden md:table-cell">

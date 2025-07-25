@@ -54,7 +54,57 @@ export const portfolioService = {
       throw new Error(`Holding with Id ${id} not found`);
     }
     
-    const deleted = portfolioData.holdings.splice(index, 1)[0];
+const deleted = portfolioData.holdings.splice(index, 1)[0];
     return { ...deleted };
+  },
+
+  async getPerformanceMetrics() {
+    await delay(200);
+    const totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
+    const totalCostBasis = portfolioData.holdings.reduce((sum, h) => sum + (h.quantity * (h.currentPrice - (h.dayChange / h.quantity))), 0);
+    const totalUnrealizedGain = totalValue - totalCostBasis;
+    const totalReturnPercent = (totalUnrealizedGain / totalCostBasis) * 100;
+    
+    return {
+      totalValue,
+      totalCostBasis,
+      totalUnrealizedGain,
+      totalReturnPercent,
+      bestPerformer: portfolioData.holdings.reduce((best, current) => 
+        current.dayChange > best.dayChange ? current : best
+      ),
+      worstPerformer: portfolioData.holdings.reduce((worst, current) => 
+        current.dayChange < worst.dayChange ? current : worst
+      )
+    };
+  },
+
+  async getDetailedAllocation() {
+    await delay(250);
+    const totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
+    
+    const stockHoldings = portfolioData.holdings.filter(h => 
+      !['BND', 'GLD'].includes(h.symbol)
+    );
+    const bondHoldings = portfolioData.holdings.filter(h => h.symbol === 'BND');
+    const otherHoldings = portfolioData.holdings.filter(h => h.symbol === 'GLD');
+    
+    return {
+      ...portfolioData.allocation,
+      breakdown: {
+        stocks: stockHoldings.map(h => ({
+          ...h,
+          percentage: (h.totalValue / totalValue) * 100
+        })),
+        bonds: bondHoldings.map(h => ({
+          ...h,
+          percentage: (h.totalValue / totalValue) * 100
+        })),
+        other: otherHoldings.map(h => ({
+          ...h,
+          percentage: (h.totalValue / totalValue) * 100
+        }))
+}
+    };
   }
 };
