@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import ApperIcon from "@/components/ApperIcon";
 import Button from "@/components/atoms/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
@@ -6,6 +7,7 @@ import ProgressBar from "@/components/atoms/ProgressBar";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 
 const GoalCard = ({ goal, onEdit, onDelete }) => {
+  const navigate = useNavigate();
   const progress = (goal.currentAmount / goal.targetAmount) * 100;
   const remainingAmount = goal.targetAmount - goal.currentAmount;
   
@@ -55,8 +57,17 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
           </div>
         </div>
 
-        {/* Action Buttons - Hidden by default, shown on hover */}
+{/* Action Buttons - Hidden by default, shown on hover */}
         <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1 bg-white rounded-lg shadow-lg p-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate(`/goals/${goal.Id}`)}
+            className="h-8 w-8 p-0 hover:bg-green-50 hover:text-green-600"
+            title="View details"
+          >
+            <ApperIcon name="Eye" className="h-4 w-4" />
+          </Button>
           <Button
             variant="ghost"
             size="sm"
@@ -72,7 +83,7 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
             onClick={onDelete}
             className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
             title="Delete goal"
->
+          >
             <ApperIcon name="Trash2" className="h-4 w-4" />
           </Button>
         </div>
