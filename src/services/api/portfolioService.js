@@ -175,8 +175,7 @@ async getPerformanceMetrics() {
 sharpeRatio: Math.round((annualizedReturn / volatility) * 100) / 100
     };
   },
-
-  async getDetailedAllocation() {
+async getDetailedAllocation() {
     await delay(250);
     const totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
     
@@ -203,5 +202,76 @@ sharpeRatio: Math.round((annualizedReturn / volatility) * 100) / 100
         }))
       }
     };
+  },
+
+  async applyRecommendations(recommendations) {
+    await delay(1500); // Simulate processing time for rebalancing
+    
+    try {
+      // In a real application, this would trigger actual rebalancing transactions
+      // For mock purposes, we'll simulate the rebalancing by updating the allocation
+      
+      const currentTotal = portfolioData.totalValue;
+      const newAllocation = { ...recommendations.targetAllocation };
+      
+      // Update the portfolio data allocation to match recommendations
+      portfolioData.allocation = {
+        stocks: newAllocation.stocks || 0,
+        bonds: newAllocation.bonds || 0,
+        alternatives: newAllocation.alternatives || 0,
+        cash: newAllocation.cash || 0
+      };
+      
+      // Simulate updating holdings based on new allocation
+      const totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
+      
+      // Update individual holdings proportionally (simplified simulation)
+      portfolioData.holdings = portfolioData.holdings.map(holding => {
+        let newValue = holding.totalValue;
+        
+        // Simulate rebalancing effects
+        if (!['BND', 'GLD'].includes(holding.symbol)) {
+          // Stock holdings
+          const targetStockValue = (newAllocation.stocks / 100) * totalValue;
+          const currentStockValue = portfolioData.holdings
+            .filter(h => !['BND', 'GLD'].includes(h.symbol))
+            .reduce((sum, h) => sum + h.totalValue, 0);
+          const adjustmentFactor = targetStockValue / currentStockValue;
+          newValue = holding.totalValue * adjustmentFactor;
+        } else if (holding.symbol === 'BND') {
+          // Bond holdings
+          const targetBondValue = (newAllocation.bonds / 100) * totalValue;
+          newValue = targetBondValue;
+        } else if (holding.symbol === 'GLD') {
+          // Alternative holdings
+          const targetAltValue = ((newAllocation.alternatives || 0) / 100) * totalValue;
+          newValue = targetAltValue;
+        }
+        
+        return {
+          ...holding,
+          totalValue: newValue,
+          shares: Math.floor(newValue / holding.currentPrice),
+          dayChange: holding.dayChange * 0.98, // Slight adjustment due to rebalancing
+          percentChange: holding.percentChange * 0.98
+        };
+      });
+      
+      // Update total value (may change slightly due to transaction costs simulation)
+      portfolioData.totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
+      portfolioData.dayChange = portfolioData.totalValue - (portfolioData.totalValue * 0.999); // Minimal change
+      portfolioData.percentChange = (portfolioData.dayChange / portfolioData.totalValue) * 100;
+      
+      return {
+        success: true,
+        message: 'Portfolio rebalanced successfully',
+        newAllocation: portfolioData.allocation,
+        transactionCost: Math.round(totalValue * 0.001), // 0.1% transaction cost
+        estimatedCompletionTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+    } catch (error) {
+      throw new Error(`Failed to apply recommendations: ${error.message}`);
+    }
   }
 };
