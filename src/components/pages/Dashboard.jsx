@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import MetricCard from "@/components/molecules/MetricCard";
 import PerformanceIndicator from "@/components/molecules/PerformanceIndicator";
+import PerformanceChart from "@/components/organisms/PerformanceChart";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import ProgressBar from "@/components/atoms/ProgressBar";
@@ -14,22 +15,26 @@ import { formatCurrency, formatDate } from "@/utils/formatters";
 
 const Dashboard = () => {
 const navigate = useNavigate();
-  const [portfolioData, setPortfolioData] = useState(null);
+const [portfolioData, setPortfolioData] = useState(null);
   const [goals, setGoals] = useState([]);
+  const [performanceMetrics, setPerformanceMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   const loadDashboardData = async () => {
     try {
       setError(null);
       setLoading(true);
       
-      const [portfolio, goalsData] = await Promise.all([
+      const [portfolio, goalsData, metrics] = await Promise.all([
         portfolioService.getPortfolioSummary(),
-        goalsService.getAll()
+        goalsService.getAll(),
+        portfolioService.getPerformanceMetrics()
       ]);
       
       setPortfolioData(portfolio);
       setGoals(goalsData.slice(0, 3)); // Show top 3 goals
+      setPerformanceMetrics(metrics);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -144,8 +149,20 @@ const navigate = useNavigate();
             </div>
           </div>
         </CardContent>
+</Card>
+
+      {/* Performance Chart Section */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <ApperIcon name="TrendingUp" size={20} />
+            <span>Portfolio Performance</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PerformanceChart />
+        </CardContent>
       </Card>
-      
       {/* Quick Goals Overview */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">

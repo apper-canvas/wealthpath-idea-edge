@@ -58,7 +58,7 @@ const deleted = portfolioData.holdings.splice(index, 1)[0];
     return { ...deleted };
   },
 
-  async getPerformanceMetrics() {
+async getPerformanceMetrics() {
     await delay(200);
     const totalValue = portfolioData.holdings.reduce((sum, h) => sum + h.totalValue, 0);
     const totalCostBasis = portfolioData.holdings.reduce((sum, h) => sum + (h.quantity * (h.currentPrice - (h.dayChange / h.quantity))), 0);
@@ -76,6 +76,103 @@ const deleted = portfolioData.holdings.splice(index, 1)[0];
       worstPerformer: portfolioData.holdings.reduce((worst, current) => 
         current.dayChange < worst.dayChange ? current : worst
       )
+    };
+  },
+
+  async getHistoricalPerformance(period = '1Y') {
+    await delay(300);
+    const currentValue = portfolioData.summary.totalValue;
+    const periods = {
+      '1M': 30,
+      '3M': 90,
+      '6M': 180,
+      '1Y': 365
+    };
+    
+    const days = periods[period] || 365;
+    const data = [];
+    const startValue = currentValue * (0.85 + Math.random() * 0.15); // Random starting value
+    
+    for (let i = days; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      // Generate realistic portfolio growth with some volatility
+      const progress = (days - i) / days;
+      const growth = 1 + (progress * 0.12) + (Math.sin(progress * Math.PI * 8) * 0.02);
+      const dailyVolatility = (Math.random() - 0.5) * 0.015;
+      const value = startValue * growth * (1 + dailyVolatility);
+      
+      data.push({
+        date: date.toISOString().split('T')[0],
+        value: Math.round(value),
+        return: ((value - startValue) / startValue) * 100
+      });
+    }
+    
+    return data;
+  },
+
+  async getBenchmarkData(period = '1Y') {
+    await delay(250);
+    const periods = {
+      '1M': 30,
+      '3M': 90,
+      '6M': 180,
+      '1Y': 365
+    };
+    
+    const days = periods[period] || 365;
+    const data = [];
+    const startValue = 100;
+    
+    for (let i = days; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      
+      const progress = (days - i) / days;
+      // S&P 500 typical growth with lower volatility than individual portfolio
+      const growth = 1 + (progress * 0.08) + (Math.sin(progress * Math.PI * 6) * 0.01);
+      const dailyVolatility = (Math.random() - 0.5) * 0.01;
+      const value = startValue * growth * (1 + dailyVolatility);
+      
+      data.push({
+        date: date.toISOString().split('T')[0],
+        value: Math.round(value * 100) / 100,
+        return: ((value - startValue) / startValue) * 100
+      });
+    }
+    
+    return data;
+  },
+
+  async getVolatilityMetrics(period = '1Y') {
+    await delay(200);
+    const historicalData = await this.getHistoricalPerformance(period);
+    
+    // Calculate daily returns
+    const dailyReturns = [];
+    for (let i = 1; i < historicalData.length; i++) {
+      const prevValue = historicalData[i - 1].value;
+      const currentValue = historicalData[i].value;
+      const dailyReturn = (currentValue - prevValue) / prevValue;
+      dailyReturns.push(dailyReturn);
+    }
+    
+    // Calculate volatility (standard deviation of returns)
+    const avgReturn = dailyReturns.reduce((sum, r) => sum + r, 0) / dailyReturns.length;
+    const variance = dailyReturns.reduce((sum, r) => sum + Math.pow(r - avgReturn, 2), 0) / dailyReturns.length;
+    const volatility = Math.sqrt(variance) * Math.sqrt(252) * 100; // Annualized volatility
+    
+    const totalReturn = historicalData[historicalData.length - 1].return;
+    const annualizedReturn = period === '1Y' ? totalReturn : 
+      (Math.pow(1 + totalReturn / 100, 365 / (historicalData.length - 1)) - 1) * 100;
+    
+    return {
+      volatility: Math.round(volatility * 100) / 100,
+      totalReturn: Math.round(totalReturn * 100) / 100,
+      annualizedReturn: Math.round(annualizedReturn * 100) / 100,
+sharpeRatio: Math.round((annualizedReturn / volatility) * 100) / 100
     };
   },
 
@@ -104,7 +201,7 @@ const deleted = portfolioData.holdings.splice(index, 1)[0];
           ...h,
           percentage: (h.totalValue / totalValue) * 100
         }))
-}
+      }
     };
   }
 };

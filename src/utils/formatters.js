@@ -28,6 +28,17 @@ export const formatPercentage = (value, options = {}) => {
   return formatted;
 };
 
+export const formatAnnualizedReturn = (value, options = {}) => {
+  const { showSign = true, decimals = 2 } = options;
+  const formatted = `${Math.abs(value).toFixed(decimals)}%`;
+  
+  if (showSign) {
+    return value >= 0 ? `+${formatted}` : `-${formatted}`;
+  }
+  
+  return formatted;
+};
+
 export const formatDate = (date) => {
   return new Intl.DateTimeFormat("en-US", {
     year: "numeric",

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import PortfolioChart from "@/components/organisms/PortfolioChart";
+import PerformanceChart from "@/components/organisms/PerformanceChart";
 import HoldingsTable from "@/components/organisms/HoldingsTable";
 import MetricCard from "@/components/molecules/MetricCard";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import ApperIcon from "@/components/ApperIcon";
 import Loading from "@/components/ui/Loading";
@@ -103,8 +105,20 @@ if (loading) return <Loading />;
           type="currency"
           gradient="from-orange-500 to-red-600"
         />
-      </div>
+</div>
 
+      {/* Performance Chart Section */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <ApperIcon name="BarChart3" size={20} />
+            <span>Performance Analysis</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <PerformanceChart />
+        </CardContent>
+      </Card>
       {/* Performance Highlights */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
