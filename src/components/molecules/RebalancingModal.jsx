@@ -38,8 +38,6 @@ const RebalancingModal = ({
     return action === 'buy' ? 'TrendingUp' : 'TrendingDown';
   };
 
-  const getActionColor = (action) => {
-    return action === 'buy' ? 'text-green-600' : 'text-red-600';
 const getActionColor = (action) => {
     return action === 'buy' ? 'text-green-600' : 'text-red-600';
   };
@@ -51,6 +49,8 @@ const getActionColor = (action) => {
       case 'low': return 'Info';
       default: return 'Circle';
     }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
