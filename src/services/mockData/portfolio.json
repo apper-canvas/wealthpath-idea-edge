@@ -1,0 +1,108 @@
+{
+  "summary": {
+    "totalValue": 487650,
+    "netWorth": 523800,
+    "dayChange": 3240,
+    "dayChangePercent": 0.67,
+    "monthChange": 12850,
+    "yearChange": 58420
+  },
+  "allocation": {
+    "stocks": 65,
+    "bonds": 25,
+    "cash": 7,
+    "other": 3
+  },
+  "holdings": [
+    {
+      "Id": 1,
+      "symbol": "AAPL",
+      "name": "Apple Inc.",
+      "quantity": 250,
+      "currentPrice": 185.42,
+      "totalValue": 46355,
+      "dayChange": 485,
+      "allocation": 9.5
+    },
+    {
+      "Id": 2,
+      "symbol": "MSFT",
+      "name": "Microsoft Corporation",
+      "quantity": 180,
+      "currentPrice": 378.85,
+      "totalValue": 68193,
+      "dayChange": 720,
+      "allocation": 14.0
+    },
+    {
+      "Id": 3,
+      "symbol": "GOOGL",
+      "name": "Alphabet Inc.",
+      "quantity": 95,
+      "currentPrice": 142.68,
+      "totalValue": 13555,
+      "dayChange": 285,
+      "allocation": 2.8
+    },
+    {
+      "Id": 4,
+      "symbol": "AMZN",
+      "name": "Amazon.com Inc.",
+      "quantity": 320,
+      "currentPrice": 153.94,
+      "totalValue": 49261,
+      "dayChange": 640,
+      "allocation": 10.1
+    },
+    {
+      "Id": 5,
+      "symbol": "TSLA",
+      "name": "Tesla Inc.",
+      "quantity": 85,
+      "currentPrice": 248.73,
+      "totalValue": 21142,
+      "dayChange": -170,
+      "allocation": 4.3
+    },
+    {
+      "Id": 6,
+      "symbol": "NVDA",
+      "name": "NVIDIA Corporation",
+      "quantity": 125,
+      "currentPrice": 878.37,
+      "totalValue": 109796,
+      "dayChange": 1250,
+      "allocation": 22.5
+    },
+    {
+      "Id": 7,
+      "symbol": "VTI",
+      "name": "Vanguard Total Stock Market ETF",
+      "quantity": 450,
+      "currentPrice": 245.82,
+      "totalValue": 110619,
+      "dayChange": 450,
+      "allocation": 22.7
+    },
+    {
+      "Id": 8,
+      "symbol": "BND",
+      "name": "Vanguard Total Bond Market ETF",
+      "quantity": 800,
+      "currentPrice": 74.95,
+      "totalValue": 59960,
+      "dayChange": -120,
+      "allocation": 12.3
+    },
+    {
+      "Id": 9,
+      "symbol": "GLD",
+      "name": "SPDR Gold Shares",
+      "quantity": 45,
+      "currentPrice": 184.92,
+      "totalValue": 8321,
+      "dayChange": -45,
+      "allocation": 1.7
+    }
+  ]
+}
