@@ -5,18 +5,19 @@ import Dashboard from "@/components/pages/Dashboard";
 import Goals from "@/components/pages/Goals";
 import Portfolio from "@/components/pages/Portfolio";
 import RiskAssessment from "@/components/pages/RiskAssessment";
-
+import MarketNews from "@/components/pages/MarketNews";
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100">
         <Layout>
-          <Routes>
+<Routes>
 <Route path="/" element={<Dashboard />} />
-            <Route path="/goals" element={<Goals />} />
-            <Route path="/portfolio" element={<Portfolio />} />
-            <Route path="/risk-assessment" element={<RiskAssessment />} />
-          </Routes>
+<Route path="/goals" element={<Goals />} />
+<Route path="/portfolio" element={<Portfolio />} />
+<Route path="/risk-assessment" element={<RiskAssessment />} />
+<Route path="/market-news" element={<MarketNews />} />
+</Routes>
         </Layout>
         <ToastContainer
           position="top-right"
