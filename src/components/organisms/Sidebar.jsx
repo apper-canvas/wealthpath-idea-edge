@@ -19,7 +19,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   
 const navigation = [
     { to: "/", icon: "LayoutDashboard", label: "Dashboard" },
-    { to: "/goals", icon: "Target", label: "Goals" },
+    { to: "/goals", icon: "Target", label: "Goals & SIP" },
     { to: "/portfolio", icon: "PieChart", label: "Portfolio" },
     { to: "/risk-assessment", icon: "Shield", label: "Risk Assessment" },
   ];

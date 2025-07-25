@@ -1,4 +1,6 @@
 import goalsData from "@/services/mockData/goals.json";
+import React from "react";
+import Error from "@/components/ui/Error";
 
 // Simulate network delay
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -59,8 +61,18 @@ export const goalsService = {
     if (index === -1) {
       throw new Error(`Goal with Id ${id} not found`);
     }
-    
-    goalsData[index].currentAmount = currentAmount;
+goalsData[index].currentAmount = currentAmount;
     return { ...goalsData[index] };
+  },
+
+  async getSipGoals() {
+    await delay(200);
+    return goalsData.map(goal => ({
+      Id: goal.Id,
+      name: goal.name,
+      category: goal.category,
+      targetAmount: goal.targetAmount,
+      currentAmount: goal.currentAmount
+    }));
   }
 };

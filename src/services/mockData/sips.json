@@ -1,0 +1,68 @@
+[
+  {
+    "Id": 1,
+    "goalId": 1,
+    "amount": 2500,
+    "frequency": "monthly",
+    "startDate": "2024-01-15",
+    "endDate": "2045-12-31",
+    "status": "active",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "nextInvestmentDate": "2024-12-15"
+  },
+  {
+    "Id": 2,
+    "goalId": 2,
+    "amount": 1000,
+    "frequency": "monthly",
+    "startDate": "2024-02-01",
+    "endDate": "2024-12-31",
+    "status": "active",
+    "createdAt": "2024-01-15T00:00:00Z",
+    "nextInvestmentDate": "2024-12-01"
+  },
+  {
+    "Id": 3,
+    "goalId": 3,
+    "amount": 1500,
+    "frequency": "monthly",
+    "startDate": "2024-03-01",
+    "endDate": "2026-06-30",
+    "status": "active",
+    "createdAt": "2024-02-15T00:00:00Z",
+    "nextInvestmentDate": "2024-12-01"
+  },
+  {
+    "Id": 4,
+    "goalId": 4,
+    "amount": 800,
+    "frequency": "monthly",
+    "startDate": "2024-01-01",
+    "endDate": "2035-08-31",
+    "status": "active",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "nextInvestmentDate": "2024-12-01"
+  },
+  {
+    "Id": 5,
+    "goalId": 5,
+    "amount": 500,
+    "frequency": "monthly",
+    "startDate": "2024-06-01",
+    "endDate": "2025-07-15",
+    "status": "paused",
+    "createdAt": "2024-05-15T00:00:00Z",
+    "nextInvestmentDate": "2024-12-01"
+  },
+  {
+    "Id": 6,
+    "goalId": 6,
+    "amount": 2000,
+    "frequency": "monthly",
+    "startDate": "2024-04-01",
+    "endDate": "2028-03-31",
+    "status": "active",
+    "createdAt": "2024-03-15T00:00:00Z",
+    "nextInvestmentDate": "2024-12-01"
+  }
+]
