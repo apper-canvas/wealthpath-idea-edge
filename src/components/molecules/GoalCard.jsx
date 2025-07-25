@@ -72,12 +72,12 @@ const GoalCard = ({ goal, onEdit, onDelete }) => {
             onClick={onDelete}
             className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
             title="Delete goal"
-          >
+>
             <ApperIcon name="Trash2" className="h-4 w-4" />
-<ApperIcon name="Trash2" className="h-4 w-4" />
           </Button>
         </div>
       </CardHeader>
+      <CardContent className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-slate-600">Progress</span>
