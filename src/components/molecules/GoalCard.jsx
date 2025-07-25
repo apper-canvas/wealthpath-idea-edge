@@ -1,9 +1,11 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card";
-import ProgressBar from "@/components/atoms/ProgressBar";
+import React from "react";
 import ApperIcon from "@/components/ApperIcon";
+import Button from "@/components/atoms/Button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
+import ProgressBar from "@/components/atoms/ProgressBar";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 
-const GoalCard = ({ goal }) => {
+const GoalCard = ({ goal, onEdit, onDelete }) => {
   const progress = (goal.currentAmount / goal.targetAmount) * 100;
   const remainingAmount = goal.targetAmount - goal.currentAmount;
   
@@ -32,7 +34,7 @@ const GoalCard = ({ goal }) => {
   };
   
   return (
-    <Card className="group hover:shadow-2xl transition-all duration-300">
+<Card className="group hover:shadow-2xl transition-all duration-300 relative">
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="space-y-1">
@@ -46,12 +48,36 @@ const GoalCard = ({ goal }) => {
               </span>
             </div>
           </div>
-          <div className={`p-3 rounded-xl bg-gradient-to-r ${getCategoryGradient(goal.category)} shadow-lg`}>
-            <ApperIcon name={getCategoryIcon(goal.category)} className="h-5 w-5 text-white" />
+          <div className="flex items-center space-x-2">
+            <div className={`p-3 rounded-xl bg-gradient-to-r ${getCategoryGradient(goal.category)} shadow-lg`}>
+              <ApperIcon name={getCategoryIcon(goal.category)} className="h-5 w-5 text-white" />
+            </div>
           </div>
         </div>
+
+        {/* Action Buttons - Hidden by default, shown on hover */}
+        <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1 bg-white rounded-lg shadow-lg p-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="h-8 w-8 p-0 hover:bg-blue-50 hover:text-blue-600"
+            title="Edit goal"
+          >
+            <ApperIcon name="Edit" className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+            title="Delete goal"
+          >
+            <ApperIcon name="Trash2" className="h-4 w-4" />
+<ApperIcon name="Trash2" className="h-4 w-4" />
+          </Button>
+        </div>
       </CardHeader>
-      <CardContent className="space-y-4">
         <div className="space-y-2">
           <div className="flex justify-between items-center">
             <span className="text-sm font-medium text-slate-600">Progress</span>
