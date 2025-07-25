@@ -357,12 +357,10 @@ if (loading) return <Loading />;
           sips={sips} 
           goals={goals} 
           onCreateSip={() => openSipModal()}
-          onEditSip={openSipModal}
+onEditSip={openSipModal}
           onToggleStatus={handleToggleSipStatus}
         />
-/>
       )}
-
       {/* Modals */}
       {/* Create Goal Modal */}
       {showCreateModal && (
