@@ -270,8 +270,40 @@ async getDetailedAllocation() {
         estimatedCompletionTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
       };
       
-    } catch (error) {
+} catch (error) {
       throw new Error(`Failed to apply recommendations: ${error.message}`);
     }
-  }
+  },
+
+  async getTargetAllocation() {
+    await delay(200);
+    return {
+      stocks: 65,
+      bonds: 25,
+      cash: 7,
+      alternatives: 3
+    };
+  },
+
+  async updateTargetAllocation(allocation) {
+    await delay(300);
+    // In real app, would save to user preferences
+    return { ...allocation };
+  },
+
+  async getRebalancingHistory() {
+    await delay(250);
+    return [
+      {
+        Id: 1,
+        date: '2024-01-15',
+        type: 'automatic',
+        changes: [
+          { asset: 'Stocks', from: 68.2, to: 65.0 },
+          { asset: 'Bonds', from: 22.1, to: 25.0 }
+        ],
+        status: 'completed'
+      }
+    ];
+}
 };

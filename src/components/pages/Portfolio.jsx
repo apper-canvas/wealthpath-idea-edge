@@ -1,16 +1,18 @@
-import { useState, useEffect } from "react";
-import PortfolioChart from "@/components/organisms/PortfolioChart";
+import React, { useEffect, useState } from "react";
+import RebalancingAlerts from "@/components/molecules/RebalancingAlerts";
+import RebalancingModal from "@/components/molecules/RebalancingModal";
+import { toast } from "react-toastify";
+import { aiRecommendationsService } from "@/services/api/aiRecommendationsService";
+import { portfolioService } from "@/services/api/portfolioService";
+import ApperIcon from "@/components/ApperIcon";
 import PerformanceChart from "@/components/organisms/PerformanceChart";
 import HoldingsTable from "@/components/organisms/HoldingsTable";
-import MetricCard from "@/components/molecules/MetricCard";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card";
+import PortfolioChart from "@/components/organisms/PortfolioChart";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
-import ApperIcon from "@/components/ApperIcon";
-import Loading from "@/components/ui/Loading";
+import MetricCard from "@/components/molecules/MetricCard";
 import Error from "@/components/ui/Error";
-import { portfolioService } from "@/services/api/portfolioService";
-import { aiRecommendationsService } from "@/services/api/aiRecommendationsService";
-import { toast } from "react-toastify";
+import Loading from "@/components/ui/Loading";
 const Portfolio = () => {
 const [portfolioData, setPortfolioData] = useState(null);
   const [performanceMetrics, setPerformanceMetrics] = useState(null);
@@ -83,16 +85,119 @@ const [portfolioData, setPortfolioData] = useState(null);
     }
   };
   
+const [rebalancingAlerts, setRebalancingAlerts] = useState([]);
+  const [driftAnalysis, setDriftAnalysis] = useState(null);
+  const [showRebalancingModal, setShowRebalancingModal] = useState(false);
+  const [rebalancingPlan, setRebalancingPlan] = useState(null);
+  const [isExecutingRebalancing, setIsExecutingRebalancing] = useState(false);
+
   useEffect(() => {
     loadPortfolioData();
+    loadRebalancingAlerts();
   }, []);
 
   useEffect(() => {
     if (portfolioData) {
       loadRecommendations();
+      loadDriftAnalysis();
     }
   }, [portfolioData]);
-  
+
+  const loadRebalancingAlerts = async () => {
+    try {
+      const { rebalancingService } = await import('@/services/api/rebalancingService');
+      const alerts = await rebalancingService.getRebalancingAlerts();
+      setRebalancingAlerts(alerts);
+      
+      // Show toast notification for new alerts
+      if (alerts.length > 0) {
+        const criticalAlerts = alerts.filter(a => a.type === 'critical');
+        if (criticalAlerts.length > 0) {
+          toast.warning('Portfolio rebalancing required - significant drift detected', {
+            position: 'top-right',
+            autoClose: 5000
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load rebalancing alerts:', error);
+    }
+  };
+
+  const loadDriftAnalysis = async () => {
+    try {
+      const { rebalancingService } = await import('@/services/api/rebalancingService');
+      const analysis = await rebalancingService.analyzePortfolioDrift();
+      setDriftAnalysis(analysis);
+    } catch (error) {
+      console.error('Failed to load drift analysis:', error);
+    }
+  };
+
+  const handleStartRebalancing = async () => {
+    try {
+      const { rebalancingService } = await import('@/services/api/rebalancingService');
+      const plan = await rebalancingService.generateRebalancingPlan();
+      setRebalancingPlan(plan);
+      setShowRebalancingModal(true);
+    } catch (error) {
+      toast.error('Failed to generate rebalancing plan');
+    }
+  };
+
+  const handleExecuteRebalancing = async () => {
+    if (!rebalancingPlan) return;
+
+    setIsExecutingRebalancing(true);
+    try {
+      const { rebalancingService } = await import('@/services/api/rebalancingService');
+      const result = await rebalancingService.executeRebalancing(rebalancingPlan);
+      
+      toast.success('Rebalancing initiated successfully', {
+        position: 'top-right',
+        autoClose: 4000
+      });
+      
+      setShowRebalancingModal(false);
+      setRebalancingPlan(null);
+      
+      // Refresh data
+      loadPortfolioData();
+      loadRebalancingAlerts();
+      
+    } catch (error) {
+      toast.error('Failed to execute rebalancing');
+    } finally {
+      setIsExecutingRebalancing(false);
+    }
+  };
+
+  const handleDismissAlert = async (alertId) => {
+    try {
+      const { rebalancingService } = await import('@/services/api/rebalancingService');
+      await rebalancingService.dismissAlert(alertId);
+      setRebalancingAlerts(alerts => alerts.filter(a => a.Id !== alertId));
+      toast.info('Alert dismissed');
+    } catch (error) {
+      toast.error('Failed to dismiss alert');
+    }
+  };
+
+  const getDriftColor = (severity) => {
+    switch (severity) {
+      case 'high': return 'text-red-600 bg-red-50 border-red-200';
+      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      default: return 'text-green-600 bg-green-50 border-green-200';
+    }
+  };
+
+  const getDriftIcon = (severity) => {
+    switch (severity) {
+      case 'high': return 'AlertTriangle';
+      case 'medium': return 'AlertCircle';
+      default: return 'CheckCircle';
+    }
+  };
   if (loading) return <Loading />;
   if (error) return <Error message={error} onRetry={loadPortfolioData} />;
   if (!portfolioData || !performanceMetrics) return null;
@@ -170,49 +275,21 @@ const [portfolioData, setPortfolioData] = useState(null);
             <ApperIcon name="BarChart3" size={20} />
             <span>Performance Analysis</span>
           </CardTitle>
-        </CardHeader>
+</CardHeader>
         <CardContent>
-          <PerformanceChart />
+          <PerformanceChart data={performanceMetrics} />
         </CardContent>
       </Card>
-      {/* Performance Highlights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-r from-green-500 to-green-600 rounded-xl shadow-lg">
-              <ApperIcon name="TrendingUp" className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Best Performer</h3>
-              <p className="text-sm text-slate-600">
-                {performanceMetrics.bestPerformer.symbol} • {performanceMetrics.bestPerformer.name}
-              </p>
-              <p className="text-lg font-bold text-green-600">
-                +${Math.abs(performanceMetrics.bestPerformer.dayChange).toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-xl p-6 border border-red-100">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl shadow-lg">
-              <ApperIcon name="TrendingDown" className="h-6 w-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-slate-900">Worst Performer</h3>
-              <p className="text-sm text-slate-600">
-                {performanceMetrics.worstPerformer.symbol} • {performanceMetrics.worstPerformer.name}
-              </p>
-              <p className="text-lg font-bold text-red-600">
-                ${performanceMetrics.worstPerformer.dayChange.toLocaleString()}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Portfolio Allocation and Holdings */}
+
+      {/* Rebalancing Alerts */}
+      <RebalancingAlerts
+        alerts={rebalancingAlerts}
+        driftAnalysis={driftAnalysis}
+        onStartRebalancing={handleStartRebalancing}
+        onDismissAlert={handleDismissAlert}
+      />
+
+      {/* Portfolio Charts and Holdings */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
         {/* Asset Allocation Chart */}
         <div className="lg:col-span-2">
@@ -279,14 +356,12 @@ const [portfolioData, setPortfolioData] = useState(null);
                       {asset.replace(/([A-Z])/g, ' $1').trim()}
                     </div>
                     <div className="text-xs text-slate-500">
-                      Current: {recommendations.currentAllocation[asset] || 0}%
-                    </div>
+</div>
                   </div>
                 ))}
               </div>
-              
-              {/* Confidence Score */}
-              <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+
+              <div className="mt-6 flex items-center justify-between">
                 <div className="flex items-center space-x-2">
                   <ApperIcon name="TrendingUp" size={16} className="text-purple-600" />
                   <span className="text-sm font-medium text-slate-700">Confidence Score</span>
@@ -439,7 +514,16 @@ const [portfolioData, setPortfolioData] = useState(null);
             </p>
           </div>
         )}
-      </div>
+</div>
+
+      {/* Rebalancing Modal */}
+      <RebalancingModal
+        isOpen={showRebalancingModal}
+        onClose={() => setShowRebalancingModal(false)}
+        plan={rebalancingPlan}
+        onExecute={handleExecuteRebalancing}
+        isExecuting={isExecutingRebalancing}
+      />
     </div>
   );
 };
