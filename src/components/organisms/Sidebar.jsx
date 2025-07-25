@@ -17,10 +17,11 @@ const Sidebar = ({ isOpen, onClose }) => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
   
-  const navigation = [
+const navigation = [
     { to: "/", icon: "LayoutDashboard", label: "Dashboard" },
     { to: "/goals", icon: "Target", label: "Goals" },
     { to: "/portfolio", icon: "PieChart", label: "Portfolio" },
+    { to: "/risk-assessment", icon: "Shield", label: "Risk Assessment" },
   ];
   
   // Desktop Sidebar - Static positioning

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MetricCard from "@/components/molecules/MetricCard";
 import PerformanceIndicator from "@/components/molecules/PerformanceIndicator";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/atoms/Card";
+import Button from "@/components/atoms/Button";
 import ProgressBar from "@/components/atoms/ProgressBar";
 import ApperIcon from "@/components/ApperIcon";
 import Loading from "@/components/ui/Loading";
@@ -11,11 +13,11 @@ import { goalsService } from "@/services/api/goalsService";
 import { formatCurrency, formatDate } from "@/utils/formatters";
 
 const Dashboard = () => {
+const navigate = useNavigate();
   const [portfolioData, setPortfolioData] = useState(null);
   const [goals, setGoals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
   const loadDashboardData = async () => {
     try {
       setError(null);
@@ -46,7 +48,7 @@ const Dashboard = () => {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">
             Dashboard
@@ -55,11 +57,20 @@ const Dashboard = () => {
             Track your investment performance and goals
           </p>
         </div>
-        <div className="mt-4 sm:mt-0 text-right">
-          <p className="text-sm text-slate-500">Last updated</p>
-          <p className="text-sm font-medium text-slate-900">
-            {new Date().toLocaleString()}
-          </p>
+        <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+          <Button 
+            onClick={() => navigate('/risk-assessment')}
+            className="mb-2 sm:mb-0 bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white shadow-lg"
+          >
+            <ApperIcon name="Shield" size={16} />
+            Take Risk Assessment
+          </Button>
+          <div className="text-right">
+            <p className="text-sm text-slate-500">Last updated</p>
+            <p className="text-sm font-medium text-slate-900">
+              {new Date().toLocaleString()}
+            </p>
+          </div>
         </div>
       </div>
       
