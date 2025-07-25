@@ -11,6 +11,8 @@ import PortfolioChart from "@/components/organisms/PortfolioChart";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/atoms/Card";
 import Button from "@/components/atoms/Button";
 import MetricCard from "@/components/molecules/MetricCard";
+import TaxHarvestingModal from "@/components/molecules/TaxHarvestingModal";
+import TaxCalendar from "@/components/molecules/TaxCalendar";
 import Error from "@/components/ui/Error";
 import Loading from "@/components/ui/Loading";
 const Portfolio = () => {
@@ -18,8 +20,10 @@ const [portfolioData, setPortfolioData] = useState(null);
   const [performanceMetrics, setPerformanceMetrics] = useState(null);
   const [recommendations, setRecommendations] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [recommendationsLoading, setRecommendationsLoading] = useState(false);
+const [recommendationsLoading, setRecommendationsLoading] = useState(false);
   const [applyingRecommendations, setApplyingRecommendations] = useState(false);
+  const [taxHarvestingModalOpen, setTaxHarvestingModalOpen] = useState(false);
+  const [taxCalendarExpanded, setTaxCalendarExpanded] = useState(false);
   const [error, setError] = useState(null);
 
   const loadPortfolioData = async () => {
@@ -96,7 +100,7 @@ const [rebalancingAlerts, setRebalancingAlerts] = useState([]);
     loadRebalancingAlerts();
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     if (portfolioData) {
       loadRecommendations();
       loadDriftAnalysis();
@@ -179,7 +183,7 @@ const [rebalancingAlerts, setRebalancingAlerts] = useState([]);
       setRebalancingAlerts(alerts => alerts.filter(a => a.Id !== alertId));
       toast.info('Alert dismissed');
     } catch (error) {
-      toast.error('Failed to dismiss alert');
+toast.error('Failed to dismiss alert');
     }
   };
 
@@ -267,19 +271,74 @@ const [rebalancingAlerts, setRebalancingAlerts] = useState([]);
           gradient="from-orange-500 to-red-600"
         />
 </div>
-
-      {/* Performance Chart Section */}
+{/* Performance Chart Section */}
       <Card className="mt-8">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <ApperIcon name="BarChart3" size={20} />
             <span>Performance Analysis</span>
           </CardTitle>
-</CardHeader>
+        </CardHeader>
         <CardContent>
           <PerformanceChart data={performanceMetrics} />
         </CardContent>
       </Card>
+
+      {/* Tax Optimization Section */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center space-x-2">
+                  <ApperIcon name="Calculator" size={20} />
+                  <span>Tax-Loss Harvesting</span>
+                </div>
+                <Button
+                  onClick={() => setTaxHarvestingModalOpen(true)}
+                  className="bg-primary-600 hover:bg-primary-700"
+                >
+                  <ApperIcon name="TrendingDown" size={16} className="mr-2" />
+                  View Opportunities
+                </Button>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-red-50 rounded-lg">
+                  <p className="text-2xl font-bold text-red-600">$3,086</p>
+                  <p className="text-sm text-red-600">Potential Losses</p>
+                </div>
+                <div className="text-center p-4 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">$1,039</p>
+                  <p className="text-sm text-green-600">Tax Savings</p>
+                </div>
+                <div className="text-center p-4 bg-blue-50 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-600">3</p>
+                  <p className="text-sm text-blue-600">Opportunities</p>
+                </div>
+              </div>
+              
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <ApperIcon name="Clock" size={16} className="text-yellow-600" />
+                  <p className="text-sm text-yellow-800 font-medium">Year-end deadline approaching</p>
+                </div>
+                <p className="text-sm text-yellow-700 mt-1">
+                  Consider executing tax-loss harvesting strategies before December 31st to maximize current year benefits.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        
+        <div>
+          <TaxCalendar 
+            isExpanded={taxCalendarExpanded}
+            onToggle={() => setTaxCalendarExpanded(!taxCalendarExpanded)}
+          />
+        </div>
+      </div>
 
       {/* Rebalancing Alerts */}
       <RebalancingAlerts
@@ -513,8 +572,14 @@ const [rebalancingAlerts, setRebalancingAlerts] = useState([]);
               Complete a risk assessment to get personalized recommendations
             </p>
           </div>
-        )}
-</div>
+)}
+      </div>
+
+      {/* Tax Harvesting Modal */}
+      <TaxHarvestingModal
+        isOpen={taxHarvestingModalOpen}
+        onClose={() => setTaxHarvestingModalOpen(false)}
+      />
 
       {/* Rebalancing Modal */}
       <RebalancingModal

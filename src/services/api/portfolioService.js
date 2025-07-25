@@ -302,8 +302,61 @@ async getDetailedAllocation() {
           { asset: 'Stocks', from: 68.2, to: 65.0 },
           { asset: 'Bonds', from: 22.1, to: 25.0 }
         ],
-        status: 'completed'
+status: 'completed'
       }
     ];
-}
+  },
+
+  // Get holdings with tax information
+  async getHoldingsWithTaxInfo() {
+    await delay(600);
+    
+    try {
+      const holdings = portfolioData.holdings.map(holding => {
+        // Calculate tax-relevant information
+        const costBasisPerShare = holding.totalValue / holding.shares / (1 + holding.changePercent / 100);
+        const totalCostBasis = costBasisPerShare * holding.shares;
+        const unrealizedGain = holding.totalValue - totalCostBasis;
+        const unrealizedGainPercent = (unrealizedGain / totalCostBasis) * 100;
+        
+        // Determine tax-loss harvesting potential
+        const isLoss = unrealizedGain < 0;
+        const significantLoss = Math.abs(unrealizedGain) > 500 || Math.abs(unrealizedGainPercent) > 5;
+        
+        let harvestingPotential = 'None';
+        if (isLoss && significantLoss) {
+          if (Math.abs(unrealizedGainPercent) > 15) {
+            harvestingPotential = 'High';
+          } else if (Math.abs(unrealizedGainPercent) > 10) {
+            harvestingPotential = 'Medium';
+          } else {
+            harvestingPotential = 'Low';
+          }
+        }
+
+        return {
+          ...holding,
+          costBasisPerShare: costBasisPerShare,
+          totalCostBasis: totalCostBasis,
+          unrealizedGain: unrealizedGain,
+          unrealizedGainPercent: unrealizedGainPercent,
+          harvestingPotential: harvestingPotential,
+          taxLossEligible: isLoss && significantLoss,
+          // Mock purchase date for tax purposes
+          purchaseDate: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000),
+          holdingPeriod: Math.random() > 0.5 ? 'Long-term' : 'Short-term'
+        };
+      });
+
+      return {
+        success: true,
+        data: holdings
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: 'Failed to load holdings with tax information'
+      };
+    }
+  }
 };
