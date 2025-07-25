@@ -1,8 +1,8 @@
 import React from "react";
-import { Route, Router, Routes } from "react-router-dom";
+import { Route, BrowserRouter, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import GoalDetail from "./components/pages/GoalDetail";
-import App from "@/index.css";
+import "@/index.css";
 import Layout from "@/components/organisms/Layout";
 import RiskAssessment from "@/components/pages/RiskAssessment";
 import Portfolio from "@/components/pages/Portfolio";
@@ -11,7 +11,7 @@ import Dashboard from "@/components/pages/Dashboard";
 import Goals from "@/components/pages/Goals";
 function App() {
   return (
-    <Router>
+    <BrowserRouter>
       <div className="App">
         <Layout>
           <Routes>
@@ -33,8 +33,8 @@ function App() {
           pauseOnHover
           className="z-50"
         />
-      </div>
-    </Router>
+</div>
+    </BrowserRouter>
   );
 }
 
